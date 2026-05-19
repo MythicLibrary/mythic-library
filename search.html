@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Archive | Mythic Library</title>
+    <style>
+        /* Reusing the same theme variables */
+        :root { --primary-bg: #0b0f19; --secondary-bg: #1a2235; --text-light: #f3f4f6; --text-muted: #9ca3af; --accent-gold: #fbbf24; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--primary-bg); color: var(--text-light); padding: 20px; position: relative; animation: pageRise 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        @keyframes pageRise { 0% { opacity: 0; top: 30px; } 100% { opacity: 1; top: 0; } }
+        .search-header { text-align: center; padding: 60px 20px; }
+        #searchInput { width: 100%; max-width: 600px; padding: 15px; border-radius: 30px; border: 1px solid #4a5568; background: var(--secondary-bg); color: white; font-size: 1.1rem; outline: none; margin-bottom: 20px; }
+        #searchInput:focus { border-color: var(--accent-gold); }
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .myth-card { background: var(--secondary-bg); padding: 25px; border-radius: 12px; border-left: 4px solid var(--accent-gold); }
+        .myth-card h3 { color: var(--accent-gold); margin-bottom: 10px; font-family: 'Georgia', serif; }
+        .category-tag { display: inline-block; padding: 2px 10px; background: rgba(251, 191, 36, 0.1); color: var(--accent-gold); border-radius: 4px; font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: var(--accent-gold); text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <div class="search-header">
+        <a href="index.html" class="back-link">&larr; Back to Home</a>
+        <h1>Mythic Archive</h1>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">Search by name, culture, or keyword</p>
+        <input type="text" id="searchInput" placeholder="Search the scrolls...">
+    </div>
+
+    <div class="results-grid" id="resultsGrid">
+        </div>
+
+    <script>
+        // THE DATA: Your 6 specific myths
+        const myths = [
+            {
+                title: "Persephone’s Descent to the Underworld",
+                category: "greek",
+                description: "Persephone is taken by Hades while picking flowers. Her mother Demeter is so devastated that she lets the world wither into winter until a deal is struck: Persephone splits her time between worlds → seasons are born."
+            },
+            {
+                title: "Ragnarök",
+                category: "norse",
+                description: "The end-of-world prophecy where gods and giants clash in a final battle. Even heavy hitters like Odin and Thor fall. The world sinks, burns, and then… regrows anew."
+            },
+            {
+                title: "Osiris’ Death and Rebirth",
+                category: "egyptian",
+                description: "Osiris is betrayed and killed by his brother Set, then reassembled and revived by Isis. He becomes ruler of the underworld, symbolizing resurrection and eternal life."
+            },
+            {
+                title: "Amaterasu and the Cave",
+                category: "japanese",
+                description: "Amaterasu hides in a cave after being angered by her brother, plunging the world into darkness. The other gods trick her out with laughter and mirrors—light returns."
+            },
+            {
+                title: "The Cú Chulainn Saga",
+                category: "celtic",
+                description: "The legendary hero Cú Chulainn defends Ulster single-handedly against armies in the epic Táin Bó Cúailnge, showcasing superhuman strength and the 'warp-spasm'."
+            },
+            {
+                title: "The Hero Twins in the Underworld",
+                category: "mesoamerican",
+                description: "From the Popol Vuh, the twin heroes descend into Xibalba (the underworld), survive deadly trials, outsmart death gods, and ultimately reshape the world."
+            }
+        ];
+
+        const searchInput = document.getElementById('searchInput');
+        const resultsGrid = document.getElementById('resultsGrid');
+
+        // Logic to render the cards
+        function renderMyths(filterTerm = "") {
+            resultsGrid.innerHTML = "";
+            const filtered = myths.filter(m => 
+                m.title.toLowerCase().includes(filterTerm.toLowerCase()) || 
+                m.category.toLowerCase().includes(filterTerm.toLowerCase()) ||
+                m.description.toLowerCase().includes(filterTerm.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                resultsGrid.innerHTML = "<p style='text-align:center; grid-column: 1/-1;'>No scrolls found in the archive...</p>";
+                return;
+            }
+
+            filtered.forEach(m => {
+                const card = document.createElement('div');
+                card.className = 'myth-card';
+                card.innerHTML = `
+                    <span class="category-tag">${m.category}</span>
+                    <h3>${m.title}</h3>
+                    <p>${m.description}</p>
+                `;
+                resultsGrid.appendChild(card);
+            });
+        }
+
+        // 1. Handle Real-time Search
+        searchInput.addEventListener('input', (e) => {
+            renderMyths(e.target.value);
+        });
+
+        // 2. Handle URL Parameters (for the "Redirect" logic)
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialFilter = urlParams.get('filter');
+            
+            if (initialFilter) {
+                searchInput.value = initialFilter;
+                renderMyths(initialFilter);
+            } else {
+                renderMyths(); // Show all by default
+            }
+        };
+    </script>
+</body>
+</html>
